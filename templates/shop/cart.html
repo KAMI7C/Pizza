@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Корзина{% endblock %}
+{% block content %}
+<h1>Корзина</h1>
+{% if cart.items.exists %}
+  <table class="table">
+    <thead>
+      <tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Сумма</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for item in cart.items.all %}
+        <tr>
+          <td>
+            {% if item.product %}
+              {{ item.product.name }}
+            {% else %}
+              <strong>Своя пицца</strong>
+              <ul class="mini-list">
+                {% for t in item.custom_pizza.toppings.all %}
+                  <li>четв. {{ t.quarter }}: {{ t.ingredient.name }}</li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </td>
+          <td>{{ item.unit_price }} BYN</td>
+          <td>
+            <form method="post" action="{% url 'shop:cart_update' item.id %}" class="inline-qty">{% csrf_token %}
+              <input type="number" name="quantity" min="1" value="{{ item.quantity }}" class="qty">
+              <button type="submit" class="btn tiny secondary">OK</button>
+            </form>
+          </td>
+          <td>{{ item.line_total }} BYN</td>
+          <td>
+            <form method="post" action="{% url 'shop:cart_remove' item.id %}">{% csrf_token %}
+              <button type="submit" class="linkish">Удалить</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="total-line">Итого: <strong>{{ cart.total }} BYN</strong></p>
+  <p><a class="btn" href="{% url 'shop:checkout' %}">Оформить заказ</a></p>
+{% else %}
+  <p>Корзина пуста. <a href="{% url 'shop:home' %}">Перейти в меню</a></p>
+{% endif %}
+{% endblock %}

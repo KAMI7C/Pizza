@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Заказ №{{ order.id }}{% endblock %}
+{% block content %}
+<h1>Заказ №{{ order.id }}</h1>
+<p>Статус: <strong>{{ order.get_status_display }}</strong></p>
+<p>Доставка: {{ order.get_delivery_type_display }} · Оплата: {{ order.get_payment_type_display }}</p>
+{% if order.estimated_delivery_at %}
+  <p>Ориентировочное время: {{ order.estimated_delivery_at|date:"d.m.Y H:i" }}</p>
+{% endif %}
+<p>Имя: {{ order.customer_name }} · Телефон: {{ order.phone }}{% if order.email %} · Email: {{ order.email }}{% endif %}</p>
+{% if order.address %}<p>Адрес: {{ order.address }}</p>{% endif %}
+{% if order.comment %}<p>Комментарий: {{ order.comment }}</p>{% endif %}
+
+<h2>Позиции</h2>
+<ul>
+  {% for line in order.items.all %}
+    <li>
+      {{ line.title }} × {{ line.quantity }} — {{ line.line_total }} BYN
+      {% if line.custom_pizza %}
+        <ul class="mini-list">
+          {% for t in line.custom_pizza.toppings.all %}
+            <li>четв. {{ t.quarter }}: {{ t.ingredient.name }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </li>
+  {% endfor %}
+</ul>
+<p class="total-line">Итого: <strong>{{ order.total }} BYN</strong></p>
+<p><a href="{% url 'shop:home' %}">На главную</a></p>
+{% endblock %}

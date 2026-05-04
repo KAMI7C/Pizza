@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+<h1>{{ title }}</h1>
+<form method="post" class="stack-form">{% csrf_token %}
+  {% for field in form %}
+    <div class="field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
+  {% endfor %}
+  <button type="submit" class="btn">Сохранить</button>
+</form>
+<p><a href="{% url 'shop:profile' %}">Назад в кабинет</a></p>
+{% endblock %}

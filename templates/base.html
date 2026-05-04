@@ -1,0 +1,43 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Пиццерия «Минская»{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'shop/css/main.css' %}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="logo" href="{% url 'shop:home' %}">Пиццерия «Минская»</a>
+      <nav class="nav">
+        <a href="{% url 'shop:home' %}">Меню</a>
+        <a href="{% url 'shop:constructor' %}">Собрать пиццу</a>
+        <a href="{% url 'shop:cart' %}">Корзина{% if cart_count %} ({{ cart_count }}){% endif %}</a>
+        {% if user.is_authenticated %}
+          <a href="{% url 'shop:profile' %}">Кабинет</a>
+          <form class="inline-logout" action="{% url 'shop:logout' %}" method="post">{% csrf_token %}
+            <button type="submit" class="linkish">Выход</button>
+          </form>
+        {% else %}
+          <a href="{% url 'shop:login' %}">Вход</a>
+          <a href="{% url 'shop:register' %}">Регистрация</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% if messages %}
+    <div class="wrap messages">
+      {% for message in messages %}
+        <p class="msg msg-{{ message.tags }}">{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <main class="wrap main-content">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

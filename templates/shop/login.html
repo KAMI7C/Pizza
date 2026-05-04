@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+{% block content %}
+<h1>Вход</h1>
+<form method="post" class="stack-form">{% csrf_token %}
+  {% if form.non_field_errors %}
+    <p class="muted">{{ form.non_field_errors }}</p>
+  {% endif %}
+  <div class="field">{{ form.username.label_tag }}{{ form.username }}{{ form.username.errors }}</div>
+  <div class="field">{{ form.password.label_tag }}{{ form.password }}{{ form.password.errors }}</div>
+  <button type="submit" class="btn">Войти</button>
+</form>
+<p><a href="{% url 'shop:register' %}">Регистрация</a></p>
+{% endblock %}

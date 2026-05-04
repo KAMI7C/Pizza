@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Личный кабинет{% endblock %}
+{% block content %}
+<h1>Личный кабинет</h1>
+
+<section class="card block">
+  <h2>Профиль</h2>
+  <form method="post" class="stack-form">{% csrf_token %}
+    <input type="hidden" name="save_profile" value="1">
+    {% for field in profile_form %}
+      <div class="field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
+    {% endfor %}
+    <button type="submit" class="btn">Сохранить</button>
+  </form>
+</section>
+
+<section class="card block">
+  <h2>Сохранённые адреса</h2>
+  <ul>
+    {% for a in addresses %}
+      <li>
+        <strong>{{ a.label }}</strong> — {{ a.address }}
+        <form method="post" action="{% url 'shop:address_delete' a.id %}" style="display:inline">{% csrf_token %}
+          <button type="submit" class="linkish">удалить</button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="muted">Пока нет адресов</li>
+    {% endfor %}
+  </ul>
+  <p><a class="btn secondary" href="{% url 'shop:address_create' %}">Добавить адрес</a></p>
+</section>
+
+<section class="card block">
+  <h2>История заказов</h2>
+  <p><a href="{% url 'shop:orders' %}">Все заказы</a></p>
+  <ul>
+    {% for o in orders %}
+      <li>
+        <a href="{% url 'shop:order_detail' o.id %}">Заказ №{{ o.id }}</a>
+        — {{ o.get_status_display }} — {{ o.total }} BYN — {{ o.created_at|date:"d.m.Y H:i" }}
+        <form method="post" action="{% url 'shop:repeat_order' o.id %}" style="display:inline">{% csrf_token %}
+          <button type="submit" class="linkish">повторить</button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="muted">Заказов пока нет</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

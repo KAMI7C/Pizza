@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Конструктор пиццы{% endblock %}
+{% block content %}
+<h1>Собрать свою пиццу</h1>
+<p class="muted">Нажмите на четверть с «+», выберите ингредиент. На куске появится картинка, если она загружена для ингредиента в админке.</p>
+
+<section class="card block builder-options">
+  <h2>Тесто и размер</h2>
+  <form method="post" action="{% url 'shop:constructor_options' %}" class="inline-row">{% csrf_token %}
+    <label>Тесто
+      <select name="crust">
+        {% for key, label in crust_labels.items %}
+          <option value="{{ key }}" {% if state.crust == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Размер
+      <select name="size">
+        {% for key, label in size_labels.items %}
+          <option value="{{ key }}" {% if state.size == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit" class="btn secondary">Применить</button>
+  </form>
+</section>
+
+<section class="builder-layout">
+  <div class="pizza-board card">
+    <div class="pizza-face" aria-label="Пицца из четырёх частей">
+      {% for num, tops in quarters %}
+        <details class="slice {% if tops %}slice-active{% endif %}" id="q{{ num }}">
+          <summary class="slice-summary">
+            <span class="plus">+</span>
+            <span class="on-slice-icons">
+              {% for ing in tops %}
+                {% if ing.image %}
+                  <img src="{{ ing.image.url }}" alt="" class="on-slice-thumb">
+                {% else %}
+                  <span class="on-slice-dot" title="{{ ing.name }}"></span>
+                {% endif %}
+              {% endfor %}
+            </span>
+            <span class="sr-only">Четверть {{ num }}</span>
+          </summary>
+          <div class="slice-panel">
+            <p>Четверть {{ num }}</p>
+            <ul class="toppings-on-slice">
+              {% for ing in tops %}
+                <li>
+                  {% if ing.image %}
+                    <img src="{{ ing.image.url }}" alt="{{ ing.name }}" class="ing-thumb">
+                  {% endif %}
+                  <span>{{ ing.name }}</span>
+                  <form method="post" action="{% url 'shop:constructor_remove_topping' %}" class="inline">{% csrf_token %}
+                    <input type="hidden" name="quarter" value="{{ num }}">
+                    <input type="hidden" name="ingredient_id" value="{{ ing.id }}">
+                    <button type="submit" class="linkish">убрать</button>
+                  </form>
+                </li>
+              {% empty %}
+                <li class="muted">Пока пусто</li>
+              {% endfor %}
+            </ul>
+            <form method="post" action="{% url 'shop:constructor_add_topping' %}" class="stack-form">{% csrf_token %}
+              <input type="hidden" name="quarter" value="{{ num }}">
+              <label>Добавить
+                <select name="ingredient_id" required>
+                  <option value="">— выберите —</option>
+                  {% for ing in ingredients %}
+                    <option value="{{ ing.id }}">{{ ing.name }} (+{{ ing.price_extra }} BYN)</option>
+                  {% endfor %}
+                </select>
+              </label>
+              <button type="submit" class="btn secondary">На этот кусок</button>
+            </form>
+          </div>
+        </details>
+      {% endfor %}
+    </div>
+    <p class="price-big">Сейчас: <strong>{{ price }} BYN</strong></p>
+    <div class="builder-actions">
+      <form method="post" action="{% url 'shop:constructor_add_to_cart' %}">{% csrf_token %}
+        <button type="submit" class="btn">В корзину</button>
+      </form>
+      <form method="post" action="{% url 'shop:constructor_reset' %}">{% csrf_token %}
+        <button type="submit" class="btn secondary">Сбросить</button>
+      </form>
+    </div>
+  </div>
+</section>
+{% endblock %}
