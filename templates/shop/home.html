@@ -35,6 +35,9 @@
 
   <form class="filters" method="get" action="">
     <div class="filter-row">
+      <label>Поиск по названию
+        <input type="text" name="q" value="{{ search_q }}" placeholder="Например, Маргарита">
+      </label>
       <label>Категория
         <select name="category" onchange="this.form.submit()">
           <option value="">Все</option>

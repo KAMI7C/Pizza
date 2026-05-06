@@ -40,7 +40,15 @@
     </tbody>
   </table>
   <p class="total-line">Итого: <strong>{{ cart.total }} BYN</strong></p>
-  <p><a class="btn" href="{% url 'shop:checkout' %}">Оформить заказ</a></p>
+  {% if user.is_authenticated %}
+    <p><a class="btn" href="{% url 'shop:checkout' %}">Оформить заказ</a></p>
+  {% else %}
+    <p class="muted">Оформление доступно только зарегистрированным пользователям.</p>
+    <p>
+      <a class="btn" href="{% url 'shop:login' %}">Войти</a>
+      <a class="btn secondary" href="{% url 'shop:register' %}">Регистрация</a>
+    </p>
+  {% endif %}
 {% else %}
   <p>Корзина пуста. <a href="{% url 'shop:home' %}">Перейти в меню</a></p>
 {% endif %}
