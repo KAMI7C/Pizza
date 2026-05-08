@@ -1,0 +1,77 @@
+<section class="card block">
+  <h2>Меню</h2>
+  <p class="muted">{{ delivery_blurb }}</p>
+
+  <form class="filters js-home-filters" method="get" action="">
+    <div class="filter-row">
+      <label>Поиск по названию
+        <input type="text" name="q" value="{{ search_q }}" placeholder="Например, Маргарита">
+      </label>
+      <label>Категория
+        <select name="category">
+          <option value="">Все</option>
+          {% for c in categories %}
+            <option value="{{ c.slug }}" {% if current_category == c.slug %}selected{% endif %}>{{ c.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Ингредиент
+        <select name="ingredient">
+          <option value="">Любые</option>
+          {% for ing in ingredients %}
+            <option value="{{ ing.id }}" {% if ingredient_id == ing.id %}selected{% endif %}>{{ ing.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label>Острота
+        <select name="spiciness">
+          <option value="">Любая</option>
+          <option value="0" {% if current_spiciness == "0" %}selected{% endif %}>Без остроты</option>
+          <option value="1" {% if current_spiciness == "1" %}selected{% endif %}>Слабо</option>
+          <option value="2" {% if current_spiciness == "2" %}selected{% endif %}>Средне</option>
+          <option value="3" {% if current_spiciness == "3" %}selected{% endif %}>Остро</option>
+        </select>
+      </label>
+    </div>
+    <div class="filter-row">
+      <label>Цена от (BYN) <input type="number" step="0.01" name="price_min" value="{{ request.GET.price_min }}"></label>
+      <label>Цена до (BYN) <input type="number" step="0.01" name="price_max" value="{{ request.GET.price_max }}"></label>
+      <label>Сортировка
+        <select name="sort">
+          <option value="popular" {% if current_sort == "popular" %}selected{% endif %}>По популярности</option>
+          <option value="price_up" {% if current_sort == "price_up" %}selected{% endif %}>Цена: по возрастанию</option>
+          <option value="price_down" {% if current_sort == "price_down" %}selected{% endif %}>Цена: по убыванию</option>
+          <option value="spice" {% if current_sort == "spice" %}selected{% endif %}>По остроте</option>
+        </select>
+      </label>
+      <button type="submit" class="btn secondary">Применить цену</button>
+    </div>
+  </form>
+
+  <div class="product-grid">
+    {% for product in products %}
+      <article class="product-card">
+        <div class="product-img">
+          {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          {% else %}
+            <div class="ph">фото</div>
+          {% endif %}
+        </div>
+        <h3>{{ product.name }}</h3>
+        <p class="composition">{{ product.composition|default:product.description|truncatewords:24 }}</p>
+        <p class="muted">Острота: {{ product.get_spiciness_display }}</p>
+        <p class="price">{{ product.price|floatformat:2 }} BYN</p>
+        <div class="card-actions">
+          <form method="post" action="{% url 'shop:add_to_cart' product.id %}">{% csrf_token %}
+            <input type="hidden" name="quantity" value="1">
+            <button type="submit" class="btn">В корзину</button>
+          </form>
+          <a class="btn secondary" href="{% url 'shop:constructor' %}">Собрать свою</a>
+        </div>
+      </article>
+    {% empty %}
+      <p>Ничего не найдено — измените фильтры.</p>
+    {% endfor %}
+  </div>
+</section>
