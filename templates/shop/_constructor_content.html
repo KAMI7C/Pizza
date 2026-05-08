@@ -1,0 +1,86 @@
+<section class="card block builder-options">
+  <h2>Тесто и размер</h2>
+  <form method="post" action="{% url 'shop:constructor_options' %}" class="inline-row js-async-constructor-form">{% csrf_token %}
+    <input type="hidden" name="quarter" value="{{ active_quarter }}">
+    <label>Тесто
+      <select name="crust">
+        {% for key, label in crust_labels.items %}
+          <option value="{{ key }}" {% if state.crust == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <label>Размер
+      <select name="size">
+        {% for key, label in size_labels.items %}
+          <option value="{{ key }}" {% if state.size == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </label>
+    <button type="submit" class="btn secondary">Применить</button>
+  </form>
+</section>
+
+<section class="builder-layout">
+  <div class="pizza-board card constructor-grid">
+    <div class="pizza-face" aria-label="Пицца из четырёх частей">
+      {% for q in quarters %}
+        <a class="slice js-quarter-link {% if q.tops %}slice-active{% endif %} {% if active_quarter == q.num %}slice-selected{% endif %}"
+           data-quarter="{{ q.num }}"
+           href="{% url 'shop:constructor' %}?quarter={{ q.num }}">
+          <span class="slice-layers">
+            {% for image_url in q.image_urls %}
+              <img src="{{ image_url }}" alt="" class="slice-layer">
+            {% endfor %}
+          </span>
+          <span class="plus">+</span>
+        </a>
+      {% endfor %}
+    </div>
+
+    <div class="slice-panel-visible">
+      <h3>Кусок {{ active_quarter }}</h3>
+      <ul class="toppings-on-slice">
+        {% for ing in active_toppings %}
+          <li>
+            {% if ing.image %}
+              <img src="{{ ing.image.url }}" alt="{{ ing.name }}" class="ing-thumb">
+            {% endif %}
+            <span>{{ ing.name }}</span>
+            <form method="post" action="{% url 'shop:constructor_remove_topping' %}" class="inline js-async-constructor-form">{% csrf_token %}
+              <input type="hidden" name="quarter" value="{{ active_quarter }}">
+              <input type="hidden" name="ingredient_id" value="{{ ing.id }}">
+              <button type="submit" class="btn tiny danger">Убрать</button>
+            </form>
+          </li>
+        {% empty %}
+          <li class="muted">На этом куске пока нет ингредиентов</li>
+        {% endfor %}
+      </ul>
+      <form method="post" action="{% url 'shop:constructor_add_topping' %}" class="stack-form js-async-constructor-form">{% csrf_token %}
+        <input type="hidden" name="quarter" value="{{ active_quarter }}">
+        <label>Добавить ингредиент
+          <select name="ingredient_id" required>
+            <option value="">— выберите —</option>
+            {% for ing in ingredients %}
+              <option value="{{ ing.id }}">{{ ing.name }} (+{{ ing.price_extra|floatformat:2 }} BYN)</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button type="submit" class="btn secondary">Добавить на кусок {{ active_quarter }}</button>
+      </form>
+    </div>
+
+    <p class="price-big">Сейчас: <strong>{{ price|floatformat:2 }} BYN</strong></p>
+    <div class="builder-actions">
+      <form method="post" action="{% url 'shop:constructor_add_to_cart' %}" class="js-async-constructor-form">{% csrf_token %}
+        <button type="submit" class="btn" {% if not all_quarters_filled %}disabled{% endif %}>В корзину</button>
+      </form>
+      <form method="post" action="{% url 'shop:constructor_reset' %}" class="js-async-constructor-form">{% csrf_token %}
+        <button type="submit" class="btn secondary">Сбросить</button>
+      </form>
+    </div>
+    {% if not all_quarters_filled %}
+      <p class="muted">Чтобы добавить пиццу в корзину, нужно заполнить ингредиентами все 4 куска.</p>
+    {% endif %}
+  </div>
+</section>
