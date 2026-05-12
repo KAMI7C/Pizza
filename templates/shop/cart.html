@@ -22,24 +22,24 @@
               </ul>
             {% endif %}
           </td>
-          <td>{{ item.unit_price }} BYN</td>
+          <td>{{ item.unit_price|floatformat:2 }} BYN</td>
           <td>
             <form method="post" action="{% url 'shop:cart_update' item.id %}" class="inline-qty">{% csrf_token %}
               <input type="number" name="quantity" min="1" value="{{ item.quantity }}" class="qty">
               <button type="submit" class="btn tiny secondary">OK</button>
             </form>
           </td>
-          <td>{{ item.line_total }} BYN</td>
+          <td>{{ item.line_total|floatformat:2 }} BYN</td>
           <td>
             <form method="post" action="{% url 'shop:cart_remove' item.id %}">{% csrf_token %}
-              <button type="submit" class="linkish">Удалить</button>
+              <button type="submit" class="btn tiny danger">Удалить</button>
             </form>
           </td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
-  <p class="total-line">Итого: <strong>{{ cart.total }} BYN</strong></p>
+  <p class="total-line">Итого: <strong>{{ cart.total|floatformat:2 }} BYN</strong></p>
   {% if user.is_authenticated %}
     <p><a class="btn" href="{% url 'shop:checkout' %}">Оформить заказ</a></p>
   {% else %}

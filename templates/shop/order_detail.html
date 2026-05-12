@@ -12,10 +12,10 @@
 {% if order.comment %}<p>Комментарий: {{ order.comment }}</p>{% endif %}
 
 <h2>Позиции</h2>
-<ul>
+<ul class="pizza-bullets">
   {% for line in order.items.all %}
     <li>
-      {{ line.title }} × {{ line.quantity }} — {{ line.line_total }} BYN
+      {{ line.title }} × {{ line.quantity }} — {{ line.line_total|floatformat:2 }} BYN
       {% if line.custom_pizza %}
         <ul class="mini-list">
           {% for t in line.custom_pizza.toppings.all %}
@@ -26,6 +26,6 @@
     </li>
   {% endfor %}
 </ul>
-<p class="total-line">Итого: <strong>{{ order.total }} BYN</strong></p>
+<p class="total-line">Итого: <strong>{{ order.total|floatformat:2 }} BYN</strong></p>
 <p><a href="{% url 'shop:home' %}">На главную</a></p>
 {% endblock %}
