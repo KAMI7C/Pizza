@@ -405,4 +405,6 @@ def repeat_order(request, pk):
     messages.success(request, "Позиции из заказа добавлены в корзину (если были в наличии).")
     return redirect("shop:cart")
 
+def pop(request):
+    return render(request,"shop/pop.html")
 

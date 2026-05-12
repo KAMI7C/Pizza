@@ -8,7 +8,11 @@
   <form method="post" class="stack-form">{% csrf_token %}
     <input type="hidden" name="save_profile" value="1">
     {% for field in profile_form %}
-      <div class="field">{{ field.label_tag }}{{ field }}{{ field.errors }}</div>
+      <div class="field">
+        {{ field.label_tag }}{{ field }}
+        {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
+        {{ field.errors }}
+      </div>
     {% endfor %}
     <button type="submit" class="btn">Сохранить</button>
   </form>
@@ -16,12 +20,12 @@
 
 <section class="card block">
   <h2>Сохранённые адреса</h2>
-  <ul>
+  <ul class="pizza-bullets">
     {% for a in addresses %}
       <li>
         <strong>{{ a.label }}</strong> — {{ a.address }}
         <form method="post" action="{% url 'shop:address_delete' a.id %}" style="display:inline">{% csrf_token %}
-          <button type="submit" class="linkish">удалить</button>
+          <button type="submit" class="btn tiny danger">Удалить</button>
         </form>
       </li>
     {% empty %}
@@ -34,13 +38,13 @@
 <section class="card block">
   <h2>История заказов</h2>
   <p><a href="{% url 'shop:orders' %}">Все заказы</a></p>
-  <ul>
+  <ul class="pizza-bullets">
     {% for o in orders %}
       <li>
         <a href="{% url 'shop:order_detail' o.id %}">Заказ №{{ o.id }}</a>
-        — {{ o.get_status_display }} — {{ o.total }} BYN — {{ o.created_at|date:"d.m.Y H:i" }}
+        — {{ o.get_status_display }} — {{ o.total|floatformat:2 }} BYN — {{ o.created_at|date:"d.m.Y H:i" }}
         <form method="post" action="{% url 'shop:repeat_order' o.id %}" style="display:inline">{% csrf_token %}
-          <button type="submit" class="linkish">повторить</button>
+          <button type="submit" class="btn tiny">Повторить</button>
         </form>
       </li>
     {% empty %}
