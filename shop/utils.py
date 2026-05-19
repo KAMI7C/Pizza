@@ -23,6 +23,8 @@ DEFAULT_BUILDER = {
     "toppings": [],  # [{"q": 1, "iid": 3}, ...] уникальные пары (q, iid)
 }
 
+MAX_CART_ITEM_QUANTITY = 100
+
 
 def _session_key(request):
     if not request.session.session_key:
@@ -50,11 +52,13 @@ def _clone_custom_pizza(old: CustomPizza) -> CustomPizza:
     return new_pizza
 
 
-def merge_session_cart_into_user(request, user):
+def merge_session_cart_into_user(request, user, session_key=None):
     """После входа: объединить гостевую корзину с корзиной пользователя."""
-    if not request.session.session_key:
+    if session_key is None:
+        session_key = request.session.session_key
+    if not session_key:
         return
-    guest = Cart.objects.filter(user=None, session_key=request.session.session_key).first()
+    guest = Cart.objects.filter(user=None, session_key=session_key).first()
     if not guest or not guest.items.exists():
         return
     user_cart, _ = Cart.objects.get_or_create(user=user, defaults={"session_key": ""})
@@ -141,11 +145,15 @@ def cart_add_product(request, product: Product, quantity: int = 1):
         return False, "Товар временно недоступен"
     line = cart.items.filter(product=product, custom_pizza__isnull=True).first()
     if line:
+        if line.quantity + quantity > MAX_CART_ITEM_QUANTITY:
+            return False, f"Максимальное количество для одной позиции — {MAX_CART_ITEM_QUANTITY}."
         line.quantity += quantity
         line.unit_price = product.price
         line.line_total = line.unit_price * line.quantity
         line.save()
     else:
+        if quantity > MAX_CART_ITEM_QUANTITY:
+            return False, f"Максимальное количество для одной позиции — {MAX_CART_ITEM_QUANTITY}."
         CartItem.objects.create(
             cart=cart,
             product=product,

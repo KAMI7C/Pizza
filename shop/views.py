@@ -125,7 +125,10 @@ def add_to_cart(request, product_id):
 
 def cart_view(request):
     cart = get_cart(request)
-    return render(request, "shop/cart.html", {"cart": cart})
+    cart_items = cart.items.select_related("product", "custom_pizza").prefetch_related(
+        "custom_pizza__toppings__ingredient"
+    )
+    return render(request, "shop/cart.html", {"cart": cart, "cart_items": cart_items})
 
 
 @require_POST
@@ -136,6 +139,8 @@ def cart_update(request, item_id):
     if qty < 1:
         item.delete()
         messages.info(request, "Позиция удалена.")
+    elif qty > 100:
+        messages.error(request, "Максимальное количество для одной позиции — 100.")
     else:
         item.quantity = qty
         item.line_total = item.unit_price * qty
@@ -168,7 +173,7 @@ def checkout(request):
         if hasattr(request.user, "profile"):
             initial["phone"] = request.user.profile.phone
     if request.method == "POST":
-        form = CheckoutForm(request.POST)
+        form = CheckoutForm(request.POST, user=request.user)
         if form.is_valid():
             order, err = place_order_from_cart(
                 cart=cart,
@@ -188,7 +193,7 @@ def checkout(request):
                 return redirect("shop:order_detail", pk=order.pk)
             messages.error(request, err or "Ошибка оформления.")
     else:
-        form = CheckoutForm(initial=initial)
+        form = CheckoutForm(initial=initial, user=request.user)
     return render(request, "shop/checkout.html", {"form": form, "cart": get_cart(request)})
 
 
@@ -313,8 +318,9 @@ class ShopLoginView(LoginView):
     redirect_authenticated_user = True
 
     def form_valid(self, form):
+        old_session_key = self.request.session.session_key
         response = super().form_valid(form)
-        merge_session_cart_into_user(self.request, self.request.user)
+        merge_session_cart_into_user(self.request, self.request.user, session_key=old_session_key)
         return response
 
 
@@ -329,8 +335,9 @@ def register(request):
         f = RegisterForm(request.POST)
         if f.is_valid():
             user = f.save()
+            old_session_key = request.session.session_key
             login(request, user)
-            merge_session_cart_into_user(request, user)
+            merge_session_cart_into_user(request, user, session_key=old_session_key)
             messages.success(request, "Добро пожаловать!")
             return redirect("shop:profile")
     else:

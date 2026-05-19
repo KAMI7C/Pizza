@@ -516,6 +516,8 @@ a { color: var(--burgundy); }
 
 .inline { display: inline; }
 
+.hidden { display: none; }
+
 @media (max-width: 760px) {
   .constructor-grid {
     grid-template-columns: 1fr;

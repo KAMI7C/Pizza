@@ -219,7 +219,7 @@ class CartItem(models.Model):
         blank=True,
         related_name="cart_item",
     )
-    quantity = models.PositiveIntegerField(default=1)
+    quantity = models.PositiveIntegerField(default=1, validators=[MaxValueValidator(100)])
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     line_total = models.DecimalField(max_digits=10, decimal_places=2)
 

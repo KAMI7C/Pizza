@@ -133,12 +133,29 @@ class CheckoutForm(forms.Form):
     )
     delivery_type = forms.ChoiceField(label="Доставка", choices=Order.DeliveryType.choices)
     payment_type = forms.ChoiceField(label="Оплата", choices=Order.PaymentType.choices)
+    saved_address = forms.ModelChoiceField(
+        queryset=SavedAddress.objects.none(),
+        required=False,
+        empty_label="Выберите адрес",
+        label="Сохранённый адрес",
+        help_text="Если выберете адрес, поле ниже можно оставить пустым.",
+    )
     address = forms.CharField(label="Адрес доставки", max_length=255, required=False)
     comment = forms.CharField(label="Комментарий к заказу", widget=forms.Textarea, required=False)
+
+    def __init__(self, *args, user=None, **kwargs):
+        self.user = user
+        super().__init__(*args, **kwargs)
+        if user is not None:
+            self.fields["saved_address"].queryset = user.saved_addresses.all()
 
     def clean(self):
         data = super().clean()
         address = (data.get("address") or "").strip()
+        saved_address = data.get("saved_address")
+        if not address and saved_address:
+            address = saved_address.address
+            data["address"] = address
         if data.get("delivery_type") == Order.DeliveryType.COURIER and not address:
             self.add_error("address", "Укажите адрес для доставки курьером.")
             return data

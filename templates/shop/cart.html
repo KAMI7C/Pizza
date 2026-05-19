@@ -8,11 +8,16 @@
       <tr><th>Товар</th><th>Цена</th><th>Кол-во</th><th>Сумма</th><th></th></tr>
     </thead>
     <tbody>
-      {% for item in cart.items.all %}
+      {% for item in cart_items %}
         <tr>
           <td>
             {% if item.product %}
-              {{ item.product.name }}
+              <span class="cart-item-name">{{ item.product.name }}</span>
+              {% if item.product.image %}
+                <div class="cart-item-img">
+                  <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                </div>
+              {% endif %}
             {% else %}
               <strong>Своя пицца</strong>
               <ul class="mini-list">
@@ -25,7 +30,7 @@
           <td>{{ item.unit_price|floatformat:2 }} BYN</td>
           <td>
             <form method="post" action="{% url 'shop:cart_update' item.id %}" class="inline-qty">{% csrf_token %}
-              <input type="number" name="quantity" min="1" value="{{ item.quantity }}" class="qty">
+              <input type="number" name="quantity" min="1" max="100" value="{{ item.quantity }}" class="qty">
               <button type="submit" class="btn tiny secondary">OK</button>
             </form>
           </td>

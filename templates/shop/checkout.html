@@ -5,12 +5,59 @@
 <p class="muted">Итого: <strong>{{ cart.total|floatformat:2 }} BYN</strong></p>
 <form method="post" class="stack-form">{% csrf_token %}
   {% for field in form %}
-    <div class="field">
-      {{ field.label_tag }}{{ field }}
-      {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
-      {{ field.errors }}
-    </div>
+    {% if field.name != "saved_address" and field.name != "address" %}
+      <div class="field">
+        {{ field.label_tag }}{{ field }}
+        {% if field.help_text %}<small class="field-help">{{ field.help_text }}</small>{% endif %}
+        {{ field.errors }}
+      </div>
+    {% endif %}
   {% endfor %}
+
+  {% if form.fields.saved_address.queryset.exists %}
+    <div id="saved-address-block" class="field">
+      {{ form.saved_address.label_tag }}{{ form.saved_address }}
+      {% if form.saved_address.help_text %}<small class="field-help">{{ form.saved_address.help_text }}</small>{% endif %}
+      {{ form.saved_address.errors }}
+    </div>
+    <button type="button" id="address-toggle-button" class="btn tiny secondary">Ввести свой адрес</button>
+  {% endif %}
+
+  <div id="own-address-block" class="field{% if form.fields.saved_address.queryset.exists %} hidden{% endif %}">
+    {{ form.address.label_tag }}{{ form.address }}
+    {% if form.address.help_text %}<small class="field-help">{{ form.address.help_text }}</small>{% endif %}
+    {{ form.address.errors }}
+    {% if form.fields.saved_address.queryset.exists %}
+      <button type="button" id="address-back-button" class="btn tiny secondary" style="margin-top:0.5rem;">Выбрать сохранённый адрес</button>
+    {% endif %}
+  </div>
+
   <button type="submit" class="btn">Подтвердить заказ</button>
 </form>
+
+{% if form.fields.saved_address.queryset.exists %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var toggle = document.getElementById('address-toggle-button');
+    var back = document.getElementById('address-back-button');
+    var saved = document.getElementById('saved-address-block');
+    var own = document.getElementById('own-address-block');
+    var savedField = document.querySelector('[name="saved_address"]');
+
+    if (toggle) {
+      toggle.addEventListener('click', function() {
+        if (saved) saved.classList.add('hidden');
+        if (own) own.classList.remove('hidden');
+        if (savedField) savedField.value = '';
+      });
+    }
+    if (back) {
+      back.addEventListener('click', function() {
+        if (saved) saved.classList.remove('hidden');
+        if (own) own.classList.add('hidden');
+      });
+    }
+  });
+</script>
+{% endif %}
 {% endblock %}
