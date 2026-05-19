@@ -16,6 +16,11 @@ body {
   background: var(--cream);
   color: var(--text);
   line-height: 1.5;
+  background-image: url('./img/bg_listwa.png');
+  background-size: cover;   
+  background-repeat: no-repeat; 
+  background-attachment: fixed;  
+  background-position: center;
 }
 
 a { color: var(--burgundy); }
@@ -210,6 +215,27 @@ a { color: var(--burgundy); }
   color: #888;
 }
 
+.cart-item-name {
+  display: block;
+  font-weight: 600;
+}
+
+.cart-item-img {
+  display: block;
+  margin-top: 0.5rem;
+  max-width: 120px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--beige);
+}
+
+.cart-item-img img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+
 .composition { font-size: 0.9rem; margin: 0.35rem 0; }
 
 .price { font-weight: 700; color: var(--green-dark); margin: 0.5rem 0; }
@@ -256,6 +282,16 @@ a { color: var(--burgundy); }
   padding: 0.5rem;
   text-align: left;
   vertical-align: top;
+}
+
+.table td .cart-item-img {
+  width: 180px;
+}
+
+.table td .cart-item-img img {
+  width: 100%;
+  border-radius: 20%;
+  box-sizing: cover;
 }
 
 .total-line { font-size: 1.1rem; }
@@ -339,7 +375,9 @@ a { color: var(--burgundy); }
   background-size: 18px 18px;
 }
 
-.builder-layout { margin-top: 1rem; }
+.builder-layout { margin-top: 1rem;
+
+}
 
 .pizza-board { max-width: 480px; }
 
