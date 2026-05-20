@@ -14,7 +14,7 @@
         {{ field.errors }}
       </div>
     {% endfor %}
-    <button type="submit" class="btn">Сохранить</button>
+    <button type="submit" class="btn btn-success">Сохранить</button>
   </form>
 </section>
 
@@ -23,7 +23,8 @@
   <ul class="pizza-bullets">
     {% for a in addresses %}
       <li>
-        <strong>{{ a.label }}</strong> — {{ a.address }}
+        <p class="piz_befo">
+        <strong>{{ a.label }}</strong> — {{ a.address }}</p>
         <form method="post" action="{% url 'shop:address_delete' a.id %}" style="display:inline">{% csrf_token %}
           <button type="submit" class="btn tiny danger">Удалить</button>
         </form>
@@ -32,7 +33,7 @@
       <li class="muted">Пока нет адресов</li>
     {% endfor %}
   </ul>
-  <p><a class="btn secondary" href="{% url 'shop:address_create' %}">Добавить адрес</a></p>
+  <p><a class="btn btn-success" href="{% url 'shop:address_create' %}">Добавить адрес</a></p>
 </section>
 
 <section class="card block">
@@ -44,7 +45,7 @@
         <a href="{% url 'shop:order_detail' o.id %}">Заказ №{{ o.id }}</a>
         — {{ o.get_status_display }} — {{ o.total|floatformat:2 }} BYN — {{ o.created_at|date:"d.m.Y H:i" }}
         <form method="post" action="{% url 'shop:repeat_order' o.id %}" style="display:inline">{% csrf_token %}
-          <button type="submit" class="btn tiny">Повторить</button>
+          <button type="submit" class="btn tiny btn-success">Повторить</button>
         </form>
       </li>
     {% empty %}

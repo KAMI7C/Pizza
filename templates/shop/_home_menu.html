@@ -44,7 +44,7 @@
           <option value="spice" {% if current_sort == "spice" %}selected{% endif %}>По остроте</option>
         </select>
       </label>
-      <button type="submit" class="btn secondary">Применить цену</button>
+      <button type="submit" class="btn btn-success">Применить цену</button>
     </div>
   </form>
 
@@ -65,7 +65,10 @@
         <div class="card-actions">
           <form method="post" action="{% url 'shop:add_to_cart' product.id %}">{% csrf_token %}
             <input type="hidden" name="quantity" value="1">
-            <button type="submit" class="btn">В корзину</button>
+            <button type="submit" class="btn btn-cart" aria-label="Добавить в корзину">
+              <span class="cart-icon" aria-hidden="true">🛒</span>
+              <span class="sr-only">Добавить в корзину</span>
+            </button>
           </form>
           <a class="btn secondary" href="{% url 'shop:constructor' %}">Собрать свою</a>
         </div>

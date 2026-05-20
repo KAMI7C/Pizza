@@ -16,7 +16,7 @@
         {% endfor %}
       </select>
     </label>
-    <button type="submit" class="btn secondary">Применить</button>
+    <button type="submit" class="btn btn-success">Применить</button>
   </form>
 </section>
 
@@ -66,14 +66,17 @@
             {% endfor %}
           </select>
         </label>
-        <button type="submit" class="btn secondary">Добавить на кусок {{ active_quarter }}</button>
+        <button type="submit" class="btn btn-success">Добавить на кусок {{ active_quarter }}</button>
       </form>
     </div>
 
     <p class="price-big">Сейчас: <strong>{{ price|floatformat:2 }} BYN</strong></p>
     <div class="builder-actions">
       <form method="post" action="{% url 'shop:constructor_add_to_cart' %}" class="js-async-constructor-form">{% csrf_token %}
-        <button type="submit" class="btn" {% if not all_quarters_filled %}disabled{% endif %}>В корзину</button>
+        <button type="submit" class="btn btn-cart" {% if not all_quarters_filled %}disabled{% endif %}>
+          <span class="cart-icon" aria-hidden="true">🛒</span>
+          <span class="sr-only">В корзину</span>
+        </button>
       </form>
       <form method="post" action="{% url 'shop:constructor_reset' %}" class="js-async-constructor-form">{% csrf_token %}
         <button type="submit" class="btn secondary">Сбросить</button>

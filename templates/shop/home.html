@@ -1,9 +1,13 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Меню — Пиццерия «Минская»{% endblock %}
 {% block content %}
 <section class="hero">
-  <h1>Добро пожаловать</h1>
-  <p class="lead">Пицца и напитки с доставкой по Минску. Соберите свою пиццу по четвертям.</p>
+  <div class="hero-content">
+    <h1  class="hero_h1" >Пицца прямо из печи</h1>
+    <p class="lead">Соберите свою пиццу или закажи из вариантов</p>
+  </div>
+  <div class="hero-lead-image" role="img" aria-label="Главная пицца"></div>
 </section>
 
 {% if promotions %}

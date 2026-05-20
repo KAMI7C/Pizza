@@ -31,7 +31,7 @@
           <td>
             <form method="post" action="{% url 'shop:cart_update' item.id %}" class="inline-qty">{% csrf_token %}
               <input type="number" name="quantity" min="1" max="100" value="{{ item.quantity }}" class="qty">
-              <button type="submit" class="btn tiny secondary">OK</button>
+              <button type="submit" class="btn tiny btn-success">OK</button>
             </form>
           </td>
           <td>{{ item.line_total|floatformat:2 }} BYN</td>
@@ -44,7 +44,8 @@
       {% endfor %}
     </tbody>
   </table>
-  <p class="total-line">Итого: <strong>{{ cart.total|floatformat:2 }} BYN</strong></p>
+  <p class="total-line">Итого: <strong>{{ cart.total|floatformat:2 }} BYN</strong>
+  </p>
   {% if user.is_authenticated %}
     <p><a class="btn" href="{% url 'shop:checkout' %}">Оформить заказ</a></p>
   {% else %}

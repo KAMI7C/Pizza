@@ -1,9 +1,11 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Оформление{% endblock %}
 {% block content %}
 <h1>Оформление заказа</h1>
 <p class="muted">Итого: <strong>{{ cart.total|floatformat:2 }} BYN</strong></p>
-<form method="post" class="stack-form">{% csrf_token %}
+<div class="checkout-layout">
+  <form method="post" class="stack-form">{% csrf_token %}
   {% for field in form %}
     {% if field.name != "saved_address" and field.name != "address" %}
       <div class="field">
@@ -19,8 +21,8 @@
       {{ form.saved_address.label_tag }}{{ form.saved_address }}
       {% if form.saved_address.help_text %}<small class="field-help">{{ form.saved_address.help_text }}</small>{% endif %}
       {{ form.saved_address.errors }}
+      <button type="button" id="address-toggle-button" class="btn tiny secondary" style="margin-top:0.75rem;">Ввести свой адрес</button>
     </div>
-    <button type="button" id="address-toggle-button" class="btn tiny secondary">Ввести свой адрес</button>
   {% endif %}
 
   <div id="own-address-block" class="field{% if form.fields.saved_address.queryset.exists %} hidden{% endif %}">
@@ -32,8 +34,10 @@
     {% endif %}
   </div>
 
-  <button type="submit" class="btn">Подтвердить заказ</button>
+  <button type="submit" class="btn btn-success">Подтвердить заказ</button>
 </form>
+  <div class="checkout-side-image" role="img" aria-label="Пицца для оформления заказа"></div>
+</div>
 
 {% if form.fields.saved_address.queryset.exists %}
 <script>
